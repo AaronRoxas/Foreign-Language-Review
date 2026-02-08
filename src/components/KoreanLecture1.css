@@ -1,0 +1,461 @@
+/* Lecture 1 – Korean consonants: gamified module */
+.korean-lecture1 {
+  --accent: #e6b422;
+  --accent-dim: #c49b1a;
+  --bg: #1a1b26;
+  --surface: #24283b;
+  --text: #c0caf5;
+  --text-muted: #a9b1d6;
+  --correct: #9ece6a;
+  --wrong: #f7768e;
+  --border: #3b4261;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.lecture-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.lecture-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.25rem 0;
+  text-shadow: 0 0 20px rgba(230, 180, 34, 0.3);
+}
+
+.lecture-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0 0 1rem 0;
+}
+
+.principles {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 2rem 1rem 1rem;
+  position: relative;
+  text-align: left;
+}
+
+.principles-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.principles-toggle:hover {
+  color: var(--text);
+}
+
+.principle {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.show-principles {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.show-principles:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Tabs */
+.mode-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #1a1b26;
+  border-color: var(--accent);
+}
+
+/* Flashcards */
+.game-area {
+  min-height: 280px;
+}
+
+.flashcards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.flashcard {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 4/3;
+  perspective: 800px;
+  cursor: pointer;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease;
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.flashcard-front {
+  background: linear-gradient(145deg, var(--surface) 0%, #2d3250 100%);
+  border: 2px solid var(--border);
+}
+
+.flashcard-back {
+  background: linear-gradient(145deg, var(--accent-dim) 0%, var(--accent) 100%);
+  color: #1a1b26;
+  transform: rotateY(180deg);
+}
+
+.flashcard-korean {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.flashcard-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+}
+
+.flashcard-sound {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.flashcard-special {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.flashcard-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flashcard-nav button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.flashcard-nav button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.flashcard-counter {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Matching */
+.matching-game {
+  width: 100%;
+}
+
+.matching-instruction {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.matching-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.matching-column h3 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+}
+
+.matching-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.matching-item {
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.matching-item.korean {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.matching-item:hover:not(.matched):not(:disabled) {
+  border-color: var(--accent-dim);
+  background: rgba(230, 180, 34, 0.1);
+}
+
+.matching-item.selected {
+  border-color: var(--accent);
+  background: rgba(230, 180, 34, 0.2);
+}
+
+.matching-item.matched {
+  opacity: 0.5;
+  cursor: default;
+  border-color: var(--correct);
+  background: rgba(158, 206, 106, 0.15);
+}
+
+.matching-item:disabled {
+  cursor: default;
+}
+
+.matching-progress {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.reset-matching {
+  display: block;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.reset-matching:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.matching-complete {
+  text-align: center;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 2px solid var(--correct);
+}
+
+.matching-complete p {
+  margin: 0 0 1rem 0;
+  color: var(--correct);
+  font-weight: 600;
+}
+
+.matching-complete button {
+  background: var(--correct);
+  color: #1a1b26;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.matching-complete button:hover {
+  filter: brightness(1.1);
+}
+
+/* Quiz */
+.quiz-game {
+  width: 100%;
+}
+
+.quiz-score {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.quiz-prompt {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.quiz-korean {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-option {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--accent-dim);
+}
+
+.quiz-option.selected {
+  border-color: var(--accent);
+  background: rgba(230, 180, 34, 0.15);
+}
+
+.quiz-option.correct {
+  border-color: var(--correct);
+  background: rgba(158, 206, 106, 0.2);
+  color: var(--correct);
+}
+
+.quiz-option.wrong {
+  border-color: var(--wrong);
+  background: rgba(247, 118, 142, 0.2);
+  color: var(--wrong);
+}
+
+.quiz-submit,
+.quiz-next {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+}
+
+.quiz-submit {
+  background: var(--accent);
+  color: #1a1b26;
+}
+
+.quiz-submit:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.quiz-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quiz-next {
+  background: var(--correct);
+  color: #1a1b26;
+}
+
+.quiz-next:hover {
+  filter: brightness(1.1);
+}
+
+@media (max-width: 480px) {
+  .matching-row {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+}
