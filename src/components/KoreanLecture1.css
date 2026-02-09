@@ -1,4 +1,4 @@
-/* Lecture 1 – Korean consonants: gamified module */
+/* Lecture 1 & 2 – Korean consonants and vowels: gamified module */
 .korean-lecture1 {
   --accent: #e6b422;
   --accent-dim: #c49b1a;
@@ -17,6 +17,37 @@
   color: var(--text);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Lesson Selector */
+.lesson-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.lesson-tab {
+  padding: 0.65rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.lesson-tab:hover {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+.lesson-tab.active {
+  background: var(--accent);
+  color: #1a1b26;
+  border-color: var(--accent);
 }
 
 .lecture-header {
@@ -56,6 +87,28 @@
   color: var(--text-muted);
   font-size: 0.95rem;
   margin: 0 0 1rem 0;
+}
+
+.quiz-instruction {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.homework {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+.homework-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 .principles {
@@ -219,6 +272,14 @@
   text-align: center;
 }
 
+.flashcard-english {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+}
+
 .flashcard-nav {
   display: flex;
   align-items: center;
@@ -290,6 +351,13 @@
 .matching-item.korean {
   font-size: 1.4rem;
   font-weight: 600;
+}
+
+.matching-english {
+  font-size: 0.7rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-left: 0.25rem;
 }
 
 .matching-item:hover:not(.matched):not(:disabled) {
@@ -393,7 +461,15 @@
   font-size: 3rem;
   font-weight: 700;
   text-align: center;
+  margin: 0 0 0.5rem 0;
+}
+
+.quiz-english {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
   margin: 0 0 1.5rem 0;
+  font-style: italic;
 }
 
 .quiz-options {

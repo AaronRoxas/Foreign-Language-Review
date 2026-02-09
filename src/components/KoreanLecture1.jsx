@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
-import { CONSONANTS, PRINCIPLES, LECTURE_TITLE, CONSONANTS_LABEL } from '../data/lecture1Consonants';
+import { useState, useMemo, useEffect } from 'react';
+import { CONSONANTS, PRINCIPLES, LECTURE_TITLE as LECTURE1_TITLE, CONSONANTS_LABEL } from '../data/lecture1Consonants';
+import { VOWELS, LECTURE_TITLE as LECTURE2_TITLE, VOWELS_LABEL } from '../data/lecture2Vowels';
 import './KoreanLecture1.css';
 
 const MODES = { flashcards: 'Flashcards', matching: 'Matching', quiz: 'Quiz' };
@@ -14,6 +15,7 @@ function shuffle(arr) {
 }
 
 export default function KoreanLecture1() {
+  const [lesson, setLesson] = useState(1);
   const [mode, setMode] = useState('flashcards');
   const [flashcardIndex, setFlashcardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -27,21 +29,54 @@ export default function KoreanLecture1() {
   const [quizComplete, setQuizComplete] = useState(false);
   const [showPrinciples, setShowPrinciples] = useState(true);
 
+  // Lesson 1 data
   const shuffledConsonants = useMemo(() => shuffle(CONSONANTS), []);
   const shuffledSounds = useMemo(() => shuffle(CONSONANTS.map((c) => c.sound)), []);
 
-  const currentCard = shuffledConsonants[flashcardIndex];
-  const totalCards = CONSONANTS.length;
+  // Lesson 2 data
+  const shuffledVowels = useMemo(() => shuffle(VOWELS), []);
+  const shuffledVowelSounds = useMemo(() => shuffle(VOWELS.map((v) => v.sound)), []);
 
-  const quizConsonant = shuffledConsonants[quizIndex];
+  // Reset states when lesson changes
+  useEffect(() => {
+    setFlashcardIndex(0);
+    setFlipped(false);
+    setMatchedPairs([]);
+    setSelectedKorean(null);
+    setSelectedSound(null);
+    setQuizIndex(0);
+    setQuizChoice(null);
+    setQuizScore(0);
+    setQuizAnswered(false);
+    setQuizComplete(false);
+  }, [lesson]);
+
+  // Current lesson data
+  const isLesson1 = lesson === 1;
+  const currentItems = isLesson1 ? shuffledConsonants : shuffledVowels;
+  const currentCard = currentItems[flashcardIndex];
+  const totalCards = isLesson1 ? CONSONANTS.length : VOWELS.length;
+
+  // Quiz data
+  const quizItem = isLesson1 ? shuffledConsonants[quizIndex] : shuffledVowels[quizIndex];
+  const quizTotal = isLesson1 ? CONSONANTS.length : VOWELS.length;
   const quizOptions = useMemo(() => {
-    if (!quizConsonant) return [];
-    const wrong = CONSONANTS.filter((c) => c.sound !== quizConsonant.sound)
-      .map((c) => c.sound)
-      .filter((s, i, a) => a.indexOf(s) === i);
-    const options = shuffle([quizConsonant.sound, ...shuffle(wrong).slice(0, 3)]);
-    return shuffle(options);
-  }, [quizIndex, quizConsonant]);
+    if (!quizItem) return [];
+    if (isLesson1) {
+      const wrong = CONSONANTS.filter((c) => c.sound !== quizItem.sound)
+        .map((c) => c.sound)
+        .filter((s, i, a) => a.indexOf(s) === i);
+      const options = shuffle([quizItem.sound, ...shuffle(wrong).slice(0, 3)]);
+      return shuffle(options);
+    } else {
+      // Lesson 2: only vowels
+      const wrong = VOWELS.filter((v) => v.sound !== quizItem.sound)
+        .map((v) => v.sound)
+        .filter((s, i, a) => a.indexOf(s) === i);
+      const options = shuffle([quizItem.sound, ...shuffle(wrong).slice(0, 3)]);
+      return shuffle(options);
+    }
+  }, [quizIndex, quizItem, isLesson1]);
 
   const handleNextFlashcard = () => {
     setFlipped(false);
@@ -60,7 +95,12 @@ export default function KoreanLecture1() {
     }
     if (sound !== undefined && selectedKorean) {
       setSelectedSound(sound);
-      const correctSound = CONSONANTS.find((c) => c.korean === selectedKorean)?.sound;
+      let correctSound;
+      if (isLesson1) {
+        correctSound = CONSONANTS.find((c) => c.korean === selectedKorean)?.sound;
+      } else {
+        correctSound = VOWELS.find((v) => v.korean === selectedKorean)?.sound;
+      }
       if (correctSound === sound) {
         setMatchedPairs((p) => [...p, selectedKorean]);
       }
@@ -72,7 +112,7 @@ export default function KoreanLecture1() {
   const handleQuizSubmit = () => {
     if (quizAnswered) return;
     setQuizAnswered(true);
-    if (quizChoice === quizConsonant?.sound) setQuizScore((s) => s + 1);
+    if (quizChoice === quizItem?.sound) setQuizScore((s) => s + 1);
   };
 
   const handleNextQuiz = () => {
@@ -80,7 +120,7 @@ export default function KoreanLecture1() {
     setQuizAnswered(false);
     setQuizIndex((i) => {
       const nextIndex = i + 1;
-      if (nextIndex >= totalCards) {
+      if (nextIndex >= quizTotal) {
         setQuizComplete(true);
         return i; // stay on the last question; UI will switch to completion view
       }
@@ -102,14 +142,35 @@ export default function KoreanLecture1() {
     setSelectedSound(null);
   };
 
-  const matchingComplete = matchedPairs.length === CONSONANTS.length;
+  const matchingTotal = isLesson1 ? CONSONANTS.length : VOWELS.length;
+  const matchingComplete = matchedPairs.length === matchingTotal;
+  
+  // Matching items for current lesson
+  const matchingItems = isLesson1 ? CONSONANTS : VOWELS;
+  const matchingSounds = isLesson1 ? shuffledSounds : shuffledVowelSounds;
 
   return (
     <div className="korean-lecture1">
+      <div className="lesson-selector">
+        <button
+          type="button"
+          className={`lesson-tab ${lesson === 1 ? 'active' : ''}`}
+          onClick={() => setLesson(1)}
+        >
+          Lesson 1
+        </button>
+        <button
+          type="button"
+          className={`lesson-tab ${lesson === 2 ? 'active' : ''}`}
+          onClick={() => setLesson(2)}
+        >
+          Lesson 2
+        </button>
+      </div>
       <header className="lecture-header">
-        <h1 className="lecture-title">{LECTURE_TITLE}</h1>
-        <p className="lecture-subtitle">{CONSONANTS_LABEL}</p>
-        {showPrinciples && (
+        <h1 className="lecture-title">{isLesson1 ? LECTURE1_TITLE : LECTURE2_TITLE}</h1>
+        <p className="lecture-subtitle">{isLesson1 ? CONSONANTS_LABEL : VOWELS_LABEL}</p>
+        {isLesson1 && showPrinciples && (
           <div className="principles">
             <button
               type="button"
@@ -126,7 +187,7 @@ export default function KoreanLecture1() {
             ))}
           </div>
         )}
-        {!showPrinciples && (
+        {isLesson1 && !showPrinciples && (
           <button type="button" className="show-principles" onClick={() => setShowPrinciples(true)}>
             Show principles
           </button>
@@ -191,11 +252,13 @@ export default function KoreanLecture1() {
         {mode === 'matching' && (
           <div className="matching-game">
             <p className="matching-instruction">
-              Click a consonant, then click its sound to make a pair.
+              {isLesson1 
+                ? 'Click a consonant, then click its sound to make a pair.'
+                : 'Click a vowel, then click its sound to make a pair.'}
             </p>
             {matchingComplete ? (
               <div className="matching-complete">
-                <p>You matched all 14 consonants!</p>
+                <p>You matched all {matchingTotal} {isLesson1 ? 'consonants' : 'items'}!</p>
                 <button type="button" onClick={resetMatching}>
                   Play again
                 </button>
@@ -204,24 +267,24 @@ export default function KoreanLecture1() {
               <>
                 <div className="matching-row">
                   <div className="matching-column">
-                    <h3>Consonant</h3>
-                    {CONSONANTS.map((c) => (
+                    <h3>{isLesson1 ? 'Consonant' : 'Vowel'}</h3>
+                    {matchingItems.map((item) => (
                       <button
-                        key={c.id}
+                        key={item.id}
                         type="button"
                         className={`matching-item korean ${
-                          selectedKorean === c.korean ? 'selected' : ''
-                        } ${matchedPairs.includes(c.korean) ? 'matched' : ''}`}
-                        onClick={() => !matchedPairs.includes(c.korean) && handleMatchingSelect(c.korean)}
-                        disabled={matchedPairs.includes(c.korean)}
+                          selectedKorean === item.korean ? 'selected' : ''
+                        } ${matchedPairs.includes(item.korean) ? 'matched' : ''}`}
+                        onClick={() => !matchedPairs.includes(item.korean) && handleMatchingSelect(item.korean)}
+                        disabled={matchedPairs.includes(item.korean)}
                       >
-                        {c.korean}
+                        {item.korean}
                       </button>
                     ))}
                   </div>
                   <div className="matching-column">
                     <h3>Sound</h3>
-                    {shuffledSounds.map((s, i) => (
+                    {matchingSounds.map((s, i) => (
                       <button
                         key={`${s}-${i}`}
                         type="button"
@@ -236,7 +299,7 @@ export default function KoreanLecture1() {
                   </div>
                 </div>
                 <p className="matching-progress">
-                  Matched: {matchedPairs.length} / {CONSONANTS.length}
+                  Matched: {matchedPairs.length} / {matchingTotal}
                 </p>
                 <button type="button" className="reset-matching" onClick={resetMatching}>
                   Reset
@@ -252,7 +315,7 @@ export default function KoreanLecture1() {
               <div className="quiz-complete">
                 <p className="quiz-complete-title">Quiz complete!</p>
                 <p className="quiz-complete-score">
-                  You scored {quizScore} out of {totalCards}. ({((quizScore / totalCards) * 100).toFixed(1)}%)
+                  You scored {quizScore} out of {quizTotal}. ({((quizScore / quizTotal) * 100).toFixed(1)}%)
                 </p>
                 <button type="button" className="quiz-restart" onClick={resetQuiz}>
                   Take quiz again
@@ -261,11 +324,15 @@ export default function KoreanLecture1() {
             ) : (
               <>
                 <p className="quiz-score">
-                  Score: {quizScore} / {totalCards}
+                  Score: {quizScore} / {quizTotal}
                 </p>
                 <div className="quiz-card">
-                  <p className="quiz-prompt">What sound does this consonant make?</p>
-                  <p className="quiz-korean">{quizConsonant?.korean}</p>
+                  <p className="quiz-prompt">
+                    {isLesson1 
+                      ? 'What sound does this consonant make?'
+                      : 'What sound does this vowel make?'}
+                  </p>
+                  <p className="quiz-korean">{quizItem?.korean}</p>
                   <div className="quiz-options">
                     {quizOptions.map((opt) => (
                       <button
@@ -273,7 +340,7 @@ export default function KoreanLecture1() {
                         type="button"
                         className={`quiz-option ${
                           quizAnswered
-                            ? opt === quizConsonant?.sound
+                            ? opt === quizItem?.sound
                               ? 'correct'
                               : quizChoice === opt
                                 ? 'wrong'
