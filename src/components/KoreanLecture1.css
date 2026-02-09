@@ -23,6 +23,26 @@
   text-align: center;
   margin-bottom: 1.5rem;
 }
+.quiz-complete{
+  text-align: center;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: 16px;
+ 
+}
+
+.quiz-restart{
+  background: var(--accent);
+  color: #1a1b26;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.quiz-restart:hover{
+  filter: brightness(1.1);
+}
 
 .lecture-title {
   font-size: 1.75rem;

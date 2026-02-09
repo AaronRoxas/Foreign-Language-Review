@@ -24,6 +24,7 @@ export default function KoreanLecture1() {
   const [quizChoice, setQuizChoice] = useState(null);
   const [quizScore, setQuizScore] = useState(0);
   const [quizAnswered, setQuizAnswered] = useState(false);
+  const [quizComplete, setQuizComplete] = useState(false);
   const [showPrinciples, setShowPrinciples] = useState(true);
 
   const shuffledConsonants = useMemo(() => shuffle(CONSONANTS), []);
@@ -77,7 +78,22 @@ export default function KoreanLecture1() {
   const handleNextQuiz = () => {
     setQuizChoice(null);
     setQuizAnswered(false);
-    setQuizIndex((i) => (i + 1) % totalCards);
+    setQuizIndex((i) => {
+      const nextIndex = i + 1;
+      if (nextIndex >= totalCards) {
+        setQuizComplete(true);
+        return i; // stay on the last question; UI will switch to completion view
+      }
+      return nextIndex;
+    });
+  };
+
+  const resetQuiz = () => {
+    setQuizIndex(0);
+    setQuizChoice(null);
+    setQuizScore(0);
+    setQuizAnswered(false);
+    setQuizComplete(false);
   };
 
   const resetMatching = () => {
@@ -123,7 +139,12 @@ export default function KoreanLecture1() {
             key={key}
             type="button"
             className={`tab ${mode === key ? 'active' : ''}`}
-            onClick={() => setMode(key)}
+            onClick={() => {
+              setMode(key);
+              if (key === 'quiz') {
+                resetQuiz();
+              }
+            }}
           >
             {label}
           </button>
@@ -227,50 +248,64 @@ export default function KoreanLecture1() {
 
         {mode === 'quiz' && (
           <div className="quiz-game">
-            <p className="quiz-score">
-              Score: {quizScore} (after this card)
-            </p>
-            <div className="quiz-card">
-              <p className="quiz-prompt">What sound does this consonant make?</p>
-              <p className="quiz-korean">{quizConsonant?.korean}</p>
-              <div className="quiz-options">
-                {quizOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    className={`quiz-option ${
-                      quizAnswered
-                        ? opt === quizConsonant?.sound
-                          ? 'correct'
-                          : quizChoice === opt
-                            ? 'wrong'
-                            : ''
-                        : quizChoice === opt
-                          ? 'selected'
-                          : ''
-                    }`}
-                    onClick={() => !quizAnswered && setQuizChoice(opt)}
-                    disabled={quizAnswered}
-                  >
-                    {opt}
-                  </button>
-                ))}
+            {quizComplete ? (
+              <div className="quiz-complete">
+                <p className="quiz-complete-title">Quiz complete!</p>
+                <p className="quiz-complete-score">
+                  You scored {quizScore} out of {totalCards}. ({((quizScore / totalCards) * 100).toFixed(1)}%)
+                </p>
+                <button type="button" className="quiz-restart" onClick={resetQuiz}>
+                  Take quiz again
+                </button>
               </div>
-              {!quizAnswered ? (
-                <button
-                  type="button"
-                  className="quiz-submit"
-                  onClick={handleQuizSubmit}
-                  disabled={quizChoice === null}
-                >
-                  Check
-                </button>
-              ) : (
-                <button type="button" className="quiz-next" onClick={handleNextQuiz}>
-                  Next →
-                </button>
-              )}
-            </div>
+            ) : (
+              <>
+                <p className="quiz-score">
+                  Score: {quizScore} / {totalCards}
+                </p>
+                <div className="quiz-card">
+                  <p className="quiz-prompt">What sound does this consonant make?</p>
+                  <p className="quiz-korean">{quizConsonant?.korean}</p>
+                  <div className="quiz-options">
+                    {quizOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        className={`quiz-option ${
+                          quizAnswered
+                            ? opt === quizConsonant?.sound
+                              ? 'correct'
+                              : quizChoice === opt
+                                ? 'wrong'
+                                : ''
+                            : quizChoice === opt
+                              ? 'selected'
+                              : ''
+                        }`}
+                        onClick={() => !quizAnswered && setQuizChoice(opt)}
+                        disabled={quizAnswered}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                  {!quizAnswered ? (
+                    <button
+                      type="button"
+                      className="quiz-submit"
+                      onClick={handleQuizSubmit}
+                      disabled={quizChoice === null}
+                    >
+                      Check
+                    </button>
+                  ) : (
+                    <button type="button" className="quiz-next" onClick={handleNextQuiz}>
+                      Next →
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
       </main>
