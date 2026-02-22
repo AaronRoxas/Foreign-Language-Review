@@ -6,8 +6,8 @@ export const VOWELS = [
   { korean: 'ㅕ', sound: 'yeo', id: 'yeo' },
   { korean: 'ㅗ', sound: 'oh', id: 'o' },
   { korean: 'ㅛ', sound: 'yoh', id: 'yo' },
-  { korean: 'ㅜ', sound: 'u', id: 'u' },
-  { korean: 'ㅠ', sound: 'yu', id: 'yu' },
+  { korean: 'ㅜ', sound: 'ooh', id: 'u' },
+  { korean: 'ㅠ', sound: 'yooh', id: 'yu' },
   { korean: 'ㅡ', sound: 'eu', id: 'eu' },
   { korean: 'ㅣ', sound: 'i', id: 'i' },
 ];
