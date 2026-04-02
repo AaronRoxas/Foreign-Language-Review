@@ -1,8 +1,135 @@
 .app {
   min-height: 100vh;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  justify-content: center;
+}
+
+.app-view {
+  width: 100%;
+  max-width: 600px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.app-view.leaving {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shared breadcrumb */
+
+.breadcrumb {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.85rem;
+}
+
+.breadcrumb-back {
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  transition: color 0.15s;
+}
+
+.breadcrumb-back:hover {
+  color: var(--accent);
+}
+
+.breadcrumb-sep {
+  color: var(--text-tertiary);
+}
+
+.breadcrumb-current {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Shared button styles */
+
+.btn-primary,
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  padding: 2rem;
-  box-sizing: border-box;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-m);
+  border: none;
+  background: var(--accent);
+  color: #0d0d0f;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.btn-primary:hover,
+.btn-accent:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-accent:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-m);
+  border: none;
+  background: var(--success);
+  color: #0d0d0f;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: filter 0.15s;
+}
+
+.btn-success:hover {
+  filter: brightness(1.1);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border-default);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.full-width {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: 1rem 1rem 3rem;
+  }
 }
