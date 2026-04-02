@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
-import { CONSONANTS, PRINCIPLES, CONSONANTS_LABEL } from '../data/lecture1Consonants'
-import { VOWELS, PRACTICE_WORDS, VOWELS_LABEL } from '../data/lecture2Vowels'
+import { getLessonModule } from '../data/lessonModules'
 import './LessonReview.css'
 
 const MODES = { flashcards: 'Flashcards', matching: 'Matching', quiz: 'Quiz' }
@@ -15,17 +14,23 @@ function shuffle(arr) {
 }
 
 export default function LessonReview({ lesson, groupTitle, onBack }) {
-  const { lessonKey } = lesson
-  const isLesson1 = lessonKey === 1
-  const isPracticeWords = lessonKey === 3
+  const moduleId = lesson.moduleId
+  const mod = getLessonModule(moduleId)
+  const {
+    items: sourceData,
+    subtitle,
+    principles,
+    notesShowLabel = 'Show key principles',
+    answerField,
+    flashcardBack,
+    showConsonantSpecialNote,
+    showPosOnVocabularyBack,
+    flashcardFrontHint,
+    matching: matchUi,
+    quiz: quizUi,
+  } = mod
 
-  const sourceData = isLesson1 ? CONSONANTS : isPracticeWords ? PRACTICE_WORDS : VOWELS
-  const answerField = isPracticeWords ? 'english' : 'sound'
-  const subtitle = isLesson1
-    ? CONSONANTS_LABEL
-    : isPracticeWords
-      ? 'Practice words with vowels'
-      : VOWELS_LABEL
+  const showPrinciplesBlock = Boolean(principles?.length)
 
   const [mode, setMode] = useState('flashcards')
   const [flashcardIndex, setFlashcardIndex] = useState(0)
@@ -42,11 +47,14 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
   const [quizAnswered, setQuizAnswered] = useState(false)
   const [quizComplete, setQuizComplete] = useState(false)
 
-  const shuffledItems = useMemo(() => shuffle(sourceData), [sourceData])
-  const shuffledAnswers = useMemo(
-    () => shuffle(sourceData.map(item => item[answerField])),
-    [sourceData, answerField],
+  const shuffledItems = useMemo(
+    () => shuffle([...getLessonModule(moduleId).items]),
+    [moduleId],
   )
+  const shuffledAnswers = useMemo(() => {
+    const { items, answerField: af } = getLessonModule(moduleId)
+    return shuffle(items.map(item => item[af]))
+  }, [moduleId])
 
   const totalCards = sourceData.length
   const currentCard = shuffledItems[flashcardIndex]
@@ -87,12 +95,13 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
   const quizCorrectAnswer = quizItem?.[answerField]
   const quizOptions = useMemo(() => {
     if (!quizItem) return []
-    const wrong = sourceData
-      .filter(item => item[answerField] !== quizItem[answerField])
-      .map(item => item[answerField])
+    const { items, answerField: af } = getLessonModule(moduleId)
+    const wrong = items
+      .filter(item => item[af] !== quizItem[af])
+      .map(item => item[af])
       .filter((s, i, a) => a.indexOf(s) === i)
-    return shuffle([quizItem[answerField], ...shuffle(wrong).slice(0, 3)])
-  }, [quizIndex, quizItem, sourceData, answerField])
+    return shuffle([quizItem[af], ...shuffle(wrong).slice(0, 3)])
+  }, [moduleId, quizItem])
 
   const handleQuizCheck = () => {
     if (quizAnswered) return
@@ -118,6 +127,8 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
     setQuizComplete(false)
   }
 
+  const isVocabCard = flashcardBack === 'vocabulary'
+
   return (
     <div className="review">
       <nav className="breadcrumb">
@@ -135,30 +146,30 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
           {lesson.title}: {lesson.subtitle}
         </h1>
         <p className="review-subtitle">{subtitle}</p>
-        {isLesson1 && showPrinciples && (
+        {showPrinciplesBlock && showPrinciples && (
           <div className="principles-box">
             <button
               className="principles-close"
               onClick={() => setShowPrinciples(false)}
               type="button"
-              aria-label="Hide principles"
+              aria-label="Hide notes"
             >
               ×
             </button>
-            {PRINCIPLES.map((p, i) => (
+            {principles.map((p, i) => (
               <p key={i} className="principle-item">
                 • {p}
               </p>
             ))}
           </div>
         )}
-        {isLesson1 && !showPrinciples && (
+        {showPrinciplesBlock && !showPrinciples && (
           <button
             className="principles-show"
             onClick={() => setShowPrinciples(true)}
             type="button"
           >
-            Show key principles
+            {notesShowLabel}
           </button>
         )}
       </header>
@@ -188,43 +199,77 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
               onKeyDown={e => e.key === 'Enter' && setFlipped(f => !f)}
               role="button"
               tabIndex={0}
+              aria-label={flipped ? 'Show front' : 'Show answer'}
             >
               <div className="flashcard-inner">
                 <div className="flashcard-front">
-                  <span className="fc-korean">{currentCard?.korean}</span>
-                  <span className="fc-hint">
-                    {isPracticeWords
-                      ? 'Tap to reveal meaning'
-                      : 'Tap to reveal sound'}
-                  </span>
+                  <div className="fc-front-accent" aria-hidden />
+                  <div className="fc-face-content fc-face-content--front">
+                    <p className="fc-korean">{currentCard?.korean}</p>
+                    <div className="fc-hint-row">
+                      <span className="fc-flip-glyph" aria-hidden>
+                        ↻
+                      </span>
+                      <span className="fc-hint">{flashcardFrontHint}</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="flashcard-back">
-                  {isPracticeWords ? (
-                    <>
-                      <span className="fc-answer">{currentCard?.sound}</span>
-                      <span className="fc-english">{currentCard?.english}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="fc-answer">{currentCard?.sound}</span>
-                      {currentCard?.special && (
-                        <span className="fc-note">
-                          Initial position: placeholder for vowel
-                        </span>
-                      )}
-                    </>
-                  )}
+                  <div className="fc-face-content fc-face-content--back">
+                    {isVocabCard ? (
+                      <>
+                        <p className="fc-label-back">Reading</p>
+                        <p className="fc-answer">{currentCard?.sound}</p>
+                        <div className="fc-back-divider" role="presentation" />
+                        <p className="fc-label-back fc-label-back--secondary">
+                          Meaning
+                        </p>
+                        <p className="fc-english">
+                          {showPosOnVocabularyBack && currentCard?.pos && (
+                            <span className="fc-pos">{currentCard.pos} · </span>
+                          )}
+                          {currentCard?.english}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="fc-label-back">Sound</p>
+                        <p className="fc-answer fc-answer--solo">{currentCard?.sound}</p>
+                        {showConsonantSpecialNote && currentCard?.special && (
+                          <p className="fc-note">
+                            Initial position: placeholder for vowel
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
             <div className="fc-nav">
-              <button type="button" className="fc-nav-btn" onClick={handlePrev}>
+              <button
+                type="button"
+                className="fc-nav-btn"
+                onClick={e => {
+                  e.stopPropagation()
+                  handlePrev()
+                }}
+              >
                 ← Prev
               </button>
               <span className="fc-counter">
-                {flashcardIndex + 1} / {totalCards}
+                <span className="fc-counter-current">{flashcardIndex + 1}</span>
+                <span className="fc-counter-sep">/</span>
+                <span className="fc-counter-total">{totalCards}</span>
               </span>
-              <button type="button" className="fc-nav-btn" onClick={handleNext}>
+              <button
+                type="button"
+                className="fc-nav-btn"
+                onClick={e => {
+                  e.stopPropagation()
+                  handleNext()
+                }}
+              >
                 Next →
               </button>
             </div>
@@ -236,13 +281,7 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
             {matchingComplete ? (
               <div className="matching-done">
                 <p className="matching-done-text">
-                  All {totalCards}{' '}
-                  {isLesson1
-                    ? 'consonants'
-                    : isPracticeWords
-                      ? 'words'
-                      : 'vowels'}{' '}
-                  matched!
+                  All {totalCards} {matchUi.doneNoun} matched!
                 </p>
                 <button
                   type="button"
@@ -254,22 +293,10 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
               </div>
             ) : (
               <>
-                <p className="matching-hint">
-                  {isLesson1
-                    ? 'Match each consonant to its sound.'
-                    : isPracticeWords
-                      ? 'Match each word to its English meaning.'
-                      : 'Match each vowel to its sound.'}
-                </p>
+                <p className="matching-hint">{matchUi.hint}</p>
                 <div className="matching-grid">
                   <div className="matching-col">
-                    <div className="matching-col-label">
-                      {isLesson1
-                        ? 'Consonant'
-                        : isPracticeWords
-                          ? 'Korean'
-                          : 'Vowel'}
-                    </div>
+                    <div className="matching-col-label">{matchUi.leftLabel}</div>
                     {sourceData.map(item => (
                       <button
                         key={item.id}
@@ -283,9 +310,7 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
                     ))}
                   </div>
                   <div className="matching-col">
-                    <div className="matching-col-label">
-                      {isPracticeWords ? 'English' : 'Sound'}
-                    </div>
+                    <div className="matching-col-label">{matchUi.rightLabel}</div>
                     {shuffledAnswers.map((answer, i) => (
                       <button
                         key={`${answer}-${i}`}
@@ -340,13 +365,7 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
                   Question {quizIndex + 1} of {totalCards}
                 </div>
                 <div className="quiz-card">
-                  <p className="quiz-prompt">
-                    {isLesson1
-                      ? 'What sound does this consonant make?'
-                      : isPracticeWords
-                        ? 'What does this word mean?'
-                        : 'What sound does this vowel make?'}
-                  </p>
+                  <p className="quiz-prompt">{quizUi.prompt}</p>
                   <p className="quiz-character">{quizItem?.korean}</p>
                   <div className="quiz-options">
                     {quizOptions.map(opt => (

@@ -4,7 +4,7 @@ export default function HomePage({ groups, onGroupClick }) {
   return (
     <div className="home">
       <header className="home-header">
-        <div className="home-logo" aria-hidden="true">한국어</div>
+        <div className="home-logo" aria-hidden="true">Foreign Language</div>
         <h1 className="home-title">Korean Review</h1>
         <p className="home-subtitle">Master hangul at your own pace</p>
       </header>
