@@ -60,6 +60,7 @@ function App() {
         )}
         {view === 'lesson' && activeLesson && (
           <LessonReview
+            key={activeLesson.id}
             lesson={activeLesson}
             groupTitle={activeGroup?.title}
             onBack={goToGroup}
