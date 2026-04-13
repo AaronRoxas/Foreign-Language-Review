@@ -121,15 +121,25 @@ export default function LessonReview({
   const quizOptions = useMemo(() => {
     if (!quizItem) return []
     const { items, answerField: af } = getLessonModule(moduleId)
-    const sameSection = quizItem.section
-      ? items.filter(item => item.section === quizItem.section)
-      : items
-    const pool = sameSection.length >= 4 ? sameSection : items
-    const wrong = pool
-      .filter(item => item[af] !== quizItem[af])
-      .map(item => item[af])
-      .filter((s, i, a) => a.indexOf(s) === i)
-    return shuffle([quizItem[af], ...shuffle(wrong).slice(0, 3)])
+    const correct = quizItem[af]
+
+    const confusables = (quizItem.confusables || []).filter(c => c !== correct)
+    const picked = shuffle(confusables).slice(0, 3)
+
+    if (picked.length < 3) {
+      const sameSection = quizItem.section
+        ? items.filter(item => item.section === quizItem.section)
+        : items
+      const pool = sameSection.length >= 4 ? sameSection : items
+      const fallback = pool
+        .filter(item => item[af] !== correct)
+        .map(item => item[af])
+        .filter((s, i, a) => a.indexOf(s) === i)
+        .filter(s => !picked.includes(s))
+      picked.push(...shuffle(fallback).slice(0, 3 - picked.length))
+    }
+
+    return shuffle([correct, ...picked])
   }, [moduleId, quizItem])
 
   const handleQuizCheck = () => {
