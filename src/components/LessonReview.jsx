@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import { getLessonModule } from '../data/lessonModules'
 import './LessonReview.css'
 
 const MODES = { flashcards: 'Flashcards', matching: 'Matching', quiz: 'Quiz' }
+const SWIPE_THRESHOLD = 80
 
 function shuffle(arr) {
   const a = [...arr]
@@ -13,7 +14,28 @@ function shuffle(arr) {
   return a
 }
 
-export default function LessonReview({ lesson, groupTitle, onBack }) {
+export default function LessonReview({
+  lesson, groupTitle, onBack,
+  lessons = [], lessonIndex = -1, onPrevLesson, onNextLesson,
+}) {
+  const touchRef = useRef(null)
+
+  const handleTouchStart = useCallback((e) => {
+    const t = e.touches[0]
+    touchRef.current = { x: t.clientX, y: t.clientY }
+  }, [])
+
+  const handleTouchEnd = useCallback((e) => {
+    if (!touchRef.current) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - touchRef.current.x
+    const dy = t.clientY - touchRef.current.y
+    touchRef.current = null
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && onNextLesson) onNextLesson()
+      else if (dx > 0 && onPrevLesson) onPrevLesson()
+    }
+  }, [onPrevLesson, onNextLesson])
   const moduleId = lesson.moduleId
   const mod = getLessonModule(moduleId)
   const {
@@ -29,6 +51,9 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
     matching: matchUi,
     quiz: quizUi,
   } = mod
+
+  const sectionLabels = mod.sectionLabels
+  const disableMatching = mod.disableMatching
 
   const showPrinciplesBlock = Boolean(principles?.length)
 
@@ -96,7 +121,11 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
   const quizOptions = useMemo(() => {
     if (!quizItem) return []
     const { items, answerField: af } = getLessonModule(moduleId)
-    const wrong = items
+    const sameSection = quizItem.section
+      ? items.filter(item => item.section === quizItem.section)
+      : items
+    const pool = sameSection.length >= 4 ? sameSection : items
+    const wrong = pool
       .filter(item => item[af] !== quizItem[af])
       .map(item => item[af])
       .filter((s, i, a) => a.indexOf(s) === i)
@@ -127,10 +156,21 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
     setQuizComplete(false)
   }
 
-  const isVocabCard = flashcardBack === 'vocabulary'
+  const getIsVocabCard = (card) => {
+    if (card?.type === 'vocabulary') return true
+    if (card?.type === 'sound') return false
+    return flashcardBack === 'vocabulary'
+  }
+
+  const prevLesson = lessonIndex > 0 ? lessons[lessonIndex - 1] : null
+  const nextLesson = lessonIndex < lessons.length - 1 ? lessons[lessonIndex + 1] : null
 
   return (
-    <div className="review">
+    <div
+      className="review"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <nav className="breadcrumb">
         <button className="breadcrumb-back" onClick={onBack} type="button">
           ← {groupTitle}
@@ -175,7 +215,9 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
       </header>
 
       <nav className="mode-tabs">
-        {Object.entries(MODES).map(([key, label]) => (
+        {Object.entries(MODES)
+          .filter(([key]) => !(key === 'matching' && disableMatching))
+          .map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -205,6 +247,11 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
                 <div className="flashcard-front">
                   <div className="fc-front-accent" aria-hidden />
                   <div className="fc-face-content fc-face-content--front">
+                    {sectionLabels && currentCard?.section && (
+                      <span className="fc-section-tag">
+                        {sectionLabels[currentCard.section]}
+                      </span>
+                    )}
                     <p className="fc-korean">{currentCard?.korean}</p>
                     <div className="fc-hint-row">
                       <span className="fc-flip-glyph" aria-hidden>
@@ -216,7 +263,7 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
                 </div>
                 <div className="flashcard-back">
                   <div className="fc-face-content fc-face-content--back">
-                    {isVocabCard ? (
+                    {getIsVocabCard(currentCard) ? (
                       <>
                         <p className="fc-label-back">Reading</p>
                         <p className="fc-answer">{currentCard?.sound}</p>
@@ -365,7 +412,14 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
                   Question {quizIndex + 1} of {totalCards}
                 </div>
                 <div className="quiz-card">
-                  <p className="quiz-prompt">{quizUi.prompt}</p>
+                  {sectionLabels && quizItem?.section && (
+                    <span className="quiz-section-tag">
+                      {sectionLabels[quizItem.section]}
+                    </span>
+                  )}
+                  <p className="quiz-prompt">
+                    {quizUi.sectionPrompts?.[quizItem?.section] || quizUi.prompt}
+                  </p>
                   <p className="quiz-character">{quizItem?.korean}</p>
                   <div className="quiz-options">
                     {quizOptions.map(opt => (
@@ -414,6 +468,37 @@ export default function LessonReview({ lesson, groupTitle, onBack }) {
           </div>
         )}
       </main>
+
+      {(prevLesson || nextLesson) && (
+        <nav className={`lesson-nav ${prevLesson && nextLesson ? '' : 'lesson-nav--single'}`}>
+          {prevLesson && (
+            <button
+              type="button"
+              className="lesson-nav-btn lesson-nav-prev"
+              onClick={onPrevLesson}
+            >
+              <span className="lesson-nav-icon">←</span>
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-dir">Previous lesson</span>
+                <span className="lesson-nav-name">{prevLesson.title}: {prevLesson.subtitle}</span>
+              </span>
+            </button>
+          )}
+          {nextLesson && (
+            <button
+              type="button"
+              className="lesson-nav-btn lesson-nav-next"
+              onClick={onNextLesson}
+            >
+              <span className="lesson-nav-label">
+                <span className="lesson-nav-dir">Next lesson</span>
+                <span className="lesson-nav-name">{nextLesson.title}: {nextLesson.subtitle}</span>
+              </span>
+              <span className="lesson-nav-icon">→</span>
+            </button>
+          )}
+        </nav>
+      )}
     </div>
   )
 }

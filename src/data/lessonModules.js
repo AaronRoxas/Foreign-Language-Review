@@ -44,6 +44,12 @@ import {
   PHONE_CALLS,
   PHONE_CALL_LABEL,
 } from './lecture7PhoneCalls'
+import {
+  EXAM_ITEMS,
+  EXAM_PRINCIPLES,
+  SECTION_LABELS,
+  SECTION_QUIZ_PROMPTS,
+} from './midtermExamReviewer'
 
 /** @type {Record<string, import('./lessonTypes').LessonModule>} */
 export const LESSON_MODULES = {
@@ -225,6 +231,28 @@ export const LESSON_MODULES = {
       doneNoun: 'words',
     },
     quiz: { prompt: 'What does this sentence mean?' },
+  },
+
+  'midterm-exam': {
+    items: EXAM_ITEMS,
+    subtitle: '55-item exam reviewer covering Lectures 1–7',
+    principles: EXAM_PRINCIPLES,
+    notesShowLabel: 'Show exam breakdown',
+    answerField: 'answer',
+    flashcardBack: 'mixed',
+    flashcardFrontHint: 'Tap to reveal answer',
+    sectionLabels: SECTION_LABELS,
+    disableMatching: true,
+    matching: {
+      hint: '',
+      leftLabel: 'Korean',
+      rightLabel: 'Answer',
+      doneNoun: 'items',
+    },
+    quiz: {
+      prompt: 'What is the answer?',
+      sectionPrompts: SECTION_QUIZ_PROMPTS,
+    },
   },
 
 }

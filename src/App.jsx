@@ -31,6 +31,20 @@ function App() {
   const goHome = () => navigate('home')
   const goToGroup = () => navigate('group', activeGroup)
 
+  const activeLessons = activeGroup?.lessons ?? []
+  const activeLessonIndex = activeLessons.findIndex(l => l.id === activeLesson?.id)
+
+  const goToPrevLesson = () => {
+    if (activeLessonIndex > 0) {
+      navigate('lesson', activeGroup, activeLessons[activeLessonIndex - 1])
+    }
+  }
+  const goToNextLesson = () => {
+    if (activeLessonIndex < activeLessons.length - 1) {
+      navigate('lesson', activeGroup, activeLessons[activeLessonIndex + 1])
+    }
+  }
+
   return (
     <div className="app">
       <div className={`app-view ${leaving ? 'leaving' : ''}`}>
@@ -49,6 +63,10 @@ function App() {
             lesson={activeLesson}
             groupTitle={activeGroup?.title}
             onBack={goToGroup}
+            lessons={activeLessons}
+            lessonIndex={activeLessonIndex}
+            onPrevLesson={activeLessonIndex > 0 ? goToPrevLesson : null}
+            onNextLesson={activeLessonIndex < activeLessons.length - 1 ? goToNextLesson : null}
           />
         )}
       </div>
