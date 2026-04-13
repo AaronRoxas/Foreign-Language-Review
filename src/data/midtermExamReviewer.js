@@ -10,7 +10,7 @@
  * * Lecture 4 Compound Vowels — Memorize!
  */
 
-// === P1. Consonants (15) ===
+// === P1. Consonants (15) — 10 basic + 5 double ===
 const P1_ITEMS = [
   { korean: 'ㄱ', sound: 'g', answer: 'g', type: 'sound', section: 'P1', id: 'exam-giyeok' },
   { korean: 'ㄴ', sound: 'n', answer: 'n', type: 'sound', section: 'P1', id: 'exam-nieun' },
@@ -22,28 +22,28 @@ const P1_ITEMS = [
   { korean: 'ㅇ', sound: 'no consonant sound', answer: 'no consonant sound', type: 'sound', section: 'P1', id: 'exam-ieung' },
   { korean: 'ㅈ', sound: 'j', answer: 'j', type: 'sound', section: 'P1', id: 'exam-jieut' },
   { korean: 'ㅊ', sound: 'ch', answer: 'ch', type: 'sound', section: 'P1', id: 'exam-chieut' },
-  { korean: 'ㅋ', sound: 'k', answer: 'k', type: 'sound', section: 'P1', id: 'exam-kiuek' },
-  { korean: 'ㅌ', sound: 't', answer: 't', type: 'sound', section: 'P1', id: 'exam-tieut' },
-  { korean: 'ㅍ', sound: 'p', answer: 'p', type: 'sound', section: 'P1', id: 'exam-pieup' },
-  { korean: 'ㅎ', sound: 'h', answer: 'h', type: 'sound', section: 'P1', id: 'exam-hieut' },
+  { korean: 'ㄲ', sound: 'gg', answer: 'gg', type: 'sound', section: 'P1', id: 'exam-ssanggiyeok' },
+  { korean: 'ㄸ', sound: 'dd', answer: 'dd', type: 'sound', section: 'P1', id: 'exam-ssangdigeut' },
   { korean: 'ㅃ', sound: 'bb', answer: 'bb', type: 'sound', section: 'P1', id: 'exam-ssangbieup' },
+  { korean: 'ㅆ', sound: 'ss', answer: 'ss', type: 'sound', section: 'P1', id: 'exam-ssangsiot' },
+  { korean: 'ㅉ', sound: 'jj', answer: 'jj', type: 'sound', section: 'P1', id: 'exam-ssangjieut' },
 ]
 
-// === P2. Vowels (15) — 10 basic + 5 compound ===
+// === P2. Vowels (15) — compound-vowel heavy ===
 const P2_ITEMS = [
   { korean: 'ㅏ', sound: 'ah', answer: 'ah', type: 'sound', section: 'P2', id: 'exam-a' },
-  { korean: 'ㅑ', sound: 'yah', answer: 'yah', type: 'sound', section: 'P2', id: 'exam-ya' },
   { korean: 'ㅓ', sound: 'eo', answer: 'eo', type: 'sound', section: 'P2', id: 'exam-eo' },
-  { korean: 'ㅕ', sound: 'yeo', answer: 'yeo', type: 'sound', section: 'P2', id: 'exam-yeo' },
   { korean: 'ㅗ', sound: 'oh', answer: 'oh', type: 'sound', section: 'P2', id: 'exam-o' },
-  { korean: 'ㅛ', sound: 'yoh', answer: 'yoh', type: 'sound', section: 'P2', id: 'exam-yo' },
-  { korean: 'ㅜ', sound: 'ooh', answer: 'ooh', type: 'sound', section: 'P2', id: 'exam-u' },
-  { korean: 'ㅠ', sound: 'yooh', answer: 'yooh', type: 'sound', section: 'P2', id: 'exam-yu' },
-  { korean: 'ㅡ', sound: 'eu', answer: 'eu', type: 'sound', section: 'P2', id: 'exam-eu' },
   { korean: 'ㅣ', sound: 'i', answer: 'i', type: 'sound', section: 'P2', id: 'exam-i' },
   { korean: 'ㅐ', sound: 'ae', answer: 'ae', type: 'sound', section: 'P2', id: 'exam-ae' },
+  { korean: 'ㅒ', sound: 'yae', answer: 'yae', type: 'sound', section: 'P2', id: 'exam-yae' },
   { korean: 'ㅔ', sound: 'eh', answer: 'eh', type: 'sound', section: 'P2', id: 'exam-eh' },
+  { korean: 'ㅖ', sound: 'yeh', answer: 'yeh', type: 'sound', section: 'P2', id: 'exam-yeh' },
   { korean: 'ㅘ', sound: 'wah', answer: 'wah', type: 'sound', section: 'P2', id: 'exam-wah' },
+  { korean: 'ㅙ', sound: 'wae', answer: 'wae', type: 'sound', section: 'P2', id: 'exam-wae-vowel' },
+  { korean: 'ㅚ', sound: 'oe', answer: 'oe', type: 'sound', section: 'P2', id: 'exam-oe' },
+  { korean: 'ㅝ', sound: 'wo', answer: 'wo', type: 'sound', section: 'P2', id: 'exam-wo' },
+  { korean: 'ㅞ', sound: 'weh', answer: 'weh', type: 'sound', section: 'P2', id: 'exam-weh' },
   { korean: 'ㅟ', sound: 'wi', answer: 'wi', type: 'sound', section: 'P2', id: 'exam-wi' },
   { korean: 'ㅢ', sound: 'eui', answer: 'eui', type: 'sound', section: 'P2', id: 'exam-eui' },
 ]
