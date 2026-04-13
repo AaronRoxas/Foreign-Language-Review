@@ -717,11 +717,38 @@
 @media (max-width: 480px) {
   .lesson-nav {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   .lesson-nav--single .lesson-nav-next,
   .lesson-nav--single .lesson-nav-prev {
     max-width: none;
+  }
+
+  .lesson-nav-btn {
+    width: min(100%, 22rem);
+    justify-content: center;
+    justify-self: center;
+    margin-inline: auto;
+    position: relative;
+  }
+
+  .lesson-nav-prev,
+  .lesson-nav-next {
+    text-align: center;
+  }
+
+  .lesson-nav-prev .lesson-nav-label,
+  .lesson-nav-next .lesson-nav-label {
+    align-items: center;
+  }
+
+  .lesson-nav-name {
+    display: none;
+  }
+
+  .lesson-nav-icon {
+    display: none;
   }
 
   .matching-grid {

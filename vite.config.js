@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Web Review',
-        short_name: 'WebReview',
+        name: 'Foreign Language Review',
+        short_name: 'Foreign Language (Korean)',
         theme_color: '#0d0d0f',
         background_color: '#0d0d0f',
         display: 'standalone',
